@@ -28,7 +28,6 @@ export default async function Home() {
             {isAuth ? (
               <FileUpload />
             ) : (
-              // <h1>File Upload</h1>
               <Link href="/sign-in">
                 <Button>
                   Login to get Started!

@@ -1,24 +1,68 @@
 "use client";
 import { uploadToS3 } from "@/lib/s3";
-import { Inbox } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios"; // Import the missing dependency
+import { Inbox, Loader2 } from "lucide-react";
+import { useState } from "react";
 import { useDropzone } from "react-dropzone";
-
+import { toast } from "react-hot-toast";
 const FileUpload = () => {
+  const [uploading, setUploading] = useState(false); // Fix the syntax error
+  console.log("LOADING FILE UPLOAD");
+  const { mutate, isLoading } = useMutation({
+    mutationFn: async ({
+      file_key,
+      file_name,
+    }: {
+      file_key: string;
+      file_name: string;
+    }) => {
+      // Fix the syntax errors and provide proper types for the variables
+      const response = await axios.post("/api/create-chat", {
+        file_key,
+        file_name,
+      });
+
+      return response.data;
+    },
+  });
+
+  console.log("MUTATE OK");
+
   const { getRootProps, getInputProps } = useDropzone({
-    accept: { "applicetion/pdf": [".pdf"] },
+    accept: { "application/pdf": [".pdf"] },
     maxFiles: 1,
     onDrop: async (acceptedFiles) => {
       console.log(acceptedFiles);
       const file = acceptedFiles[0];
+
       if (file.size > 10 * 1024 * 1024) {
+        toast.error("File too large!"); // nice notification
         alert("File size should be less than 10MB");
         return;
       }
       try {
+        setUploading(true); // start the uploading
         const data = await uploadToS3(file);
-        console.log("data", data);
+        if (!data?.file_key || !data?.file_name) {
+          toast.error("Something went wrong");
+          alert("Error uploading file");
+          return;
+        }
+        mutate(data, {
+          onSuccess: (data) => {
+            toast.success(data.message); // nice notification
+            console.log("data", data);
+          },
+          onError: (error) => {
+            console.error("error", error);
+            toast.error("Error creating chat" + error.message); // nice notification
+          },
+        });
       } catch (error) {
         console.error(error);
+      } finally {
+        setUploading(false); // at the very end
       }
     },
   });
@@ -31,10 +75,18 @@ const FileUpload = () => {
         })}
       >
         <input {...getInputProps()} />
-        <>
-          <Inbox className="w-10 h-10 text-blue-500" />
-          <p className="mt-2 text-sm text-slate-400">Drop PDF Here</p>
-        </>
+        {uploading || isLoading ? (
+          <>
+            {/* Loader Loading the Loading */}
+            <Loader2 className="h-10 w-10 text-blue-500 animate-sping" />
+            <p className="mt-2 text-sm text-slate-400">Heney on the GPT...</p>
+          </>
+        ) : (
+          <>
+            <Inbox className="w-10 h-10 text-blue-500" />
+            <p className="mt-2 text-sm text-slate-400">Drop PDF Here</p>
+          </>
+        )}
       </div>
     </div>
   );
