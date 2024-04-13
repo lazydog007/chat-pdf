@@ -3,12 +3,14 @@ import { uploadToS3 } from "@/lib/s3";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios"; // Import the missing dependency
 import { Inbox, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "react-hot-toast";
 const FileUpload = () => {
-  const [uploading, setUploading] = useState(false); // Fix the syntax error
-  console.log("LOADING FILE UPLOAD");
+  const router = useRouter();
+  const [uploading, setUploading] = useState(false);
+
   const { mutate, isLoading } = useMutation({
     mutationFn: async ({
       file_key,
@@ -22,18 +24,14 @@ const FileUpload = () => {
         file_key,
         file_name,
       });
-
       return response.data;
     },
   });
-
-  console.log("MUTATE OK");
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: { "application/pdf": [".pdf"] },
     maxFiles: 1,
     onDrop: async (acceptedFiles) => {
-      console.log(acceptedFiles);
       const file = acceptedFiles[0];
 
       if (file.size > 10 * 1024 * 1024) {
@@ -43,16 +41,19 @@ const FileUpload = () => {
       }
       try {
         setUploading(true); // start the uploading
+
         const data = await uploadToS3(file);
+
         if (!data?.file_key || !data?.file_name) {
           toast.error("Something went wrong");
           alert("Error uploading file");
           return;
         }
+
+        // make the axios call here with the mutate
         mutate(data, {
           onSuccess: (data) => {
             toast.success(data.message); // nice notification
-            console.log("data", data);
           },
           onError: (error) => {
             console.error("error", error);
