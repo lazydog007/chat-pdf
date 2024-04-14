@@ -1,6 +1,8 @@
 "use client";
 
-import { useChat } from "ai/react";
+import { useQuery } from "@tanstack/react-query";
+import { Message, useChat } from "ai/react";
+import axios from "axios";
 import { Send } from "lucide-react";
 import React from "react";
 import MessageList from "./MessageList";
@@ -9,11 +11,22 @@ import { Input } from "./ui/input";
 type Props = { chatId: number };
 
 const ChatComponent = ({ chatId }: Props) => {
+  // This gets the old messages
+  const { data, isPending } = useQuery({
+    queryKey: ["chat", chatId],
+    queryFn: async () => {
+      const response = await axios.post<Message[]>(`/api/get-messages`, {
+        chatId,
+      });
+      return await response.data;
+    },
+  });
   const { input, handleInputChange, handleSubmit, messages } = useChat({
     api: "/api/chat",
     body: {
       chatId,
     },
+    initialMessages: data || [],
   });
 
   // smooth scrolling down of the chat
@@ -35,7 +48,7 @@ const ChatComponent = ({ chatId }: Props) => {
       </div>
 
       {/* message list*/}
-      <MessageList messages={messages} />
+      <MessageList messages={messages} isPending={isPending} />
 
       {/* input form */}
       <form

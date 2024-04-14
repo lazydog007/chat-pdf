@@ -1,6 +1,6 @@
 import { getContext } from "@/lib/context";
 import { db } from "@/lib/db";
-import { chats } from "@/lib/db/schema";
+import { messages as _messages, chats } from "@/lib/db/schema";
 import { Message, OpenAIStream, StreamingTextResponse } from "ai";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
@@ -43,10 +43,6 @@ export async function POST(req: Request) {
       Al assistant will not invent anything that is not draw directly from the context.`,
     };
 
-    console.log("context", context);
-    console.log("\n");
-    console.log("prompt", prompt);
-
     const response = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       messages: [
@@ -57,7 +53,25 @@ export async function POST(req: Request) {
     });
 
     // streaming effect is awesome
-    const stream = OpenAIStream(response);
+    // completion is the response from the AI
+    const stream = OpenAIStream(response, {
+      onStart: async () => {
+        // save user message into db
+        await db.insert(_messages).values({
+          chatId,
+          content: lastMessage.content,
+          role: "user",
+        }); // make sure its drizzle
+      },
+      onCompletion: async (completion) => {
+        // save ai message into db
+        await db.insert(_messages).values({
+          chatId,
+          content: completion,
+          role: "system",
+        }); // make sure its drizzle
+      },
+    });
     return new StreamingTextResponse(stream);
   } catch (error) {
     console.log("something bad happened");
