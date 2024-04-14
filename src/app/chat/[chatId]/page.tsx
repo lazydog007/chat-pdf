@@ -19,27 +19,24 @@ const ChatPage = async ({ params: { chatId } }: Props) => {
   }
 
   // _chats are the list of the chats that the user has
-  const userChats = await db
-    .select()
-    .from(chats)
-    .where(eq(chats.userId, userId));
+  const _chats = await db.select().from(chats).where(eq(chats.userId, userId));
 
-  if (!userChats) {
+  if (!_chats) {
     return redirect("/");
   }
 
-  if (!userChats.find((chat) => chat.id === parseInt(chatId))) {
+  if (!_chats.find((chat) => chat.id === parseInt(chatId))) {
     return redirect("/");
   }
 
-  const currentChat = userChats.find((chat) => chat.id === parseInt(chatId));
+  const currentChat = _chats.find((chat) => chat.id === parseInt(chatId));
 
   return (
     <div className="flex h-screen">
       <div className="flex w-full">
         {/* chat sidebar*/}
         <div className="flex-[1] max-w-xs">
-          <ChatSidebar chats={userChats} chatId={parseInt(chatId)} />
+          <ChatSidebar chats={_chats} chatId={parseInt(chatId)} />
         </div>
         {/* pdf viewer */}
         <div className="flex-[5] p-4">
@@ -47,7 +44,7 @@ const ChatPage = async ({ params: { chatId } }: Props) => {
         </div>
         {/* chat component */}
         <div className="flex-[3] border-1-4 border-1-slate-200 overflow-scroll">
-          <ChatComponent />
+          <ChatComponent chatId={parseInt(chatId)} />
         </div>
       </div>
     </div>

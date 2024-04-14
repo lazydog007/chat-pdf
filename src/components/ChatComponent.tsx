@@ -2,17 +2,33 @@
 
 import { useChat } from "ai/react";
 import { Send } from "lucide-react";
+import React from "react";
 import MessageList from "./MessageList";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-type Props = {};
+type Props = { chatId: number };
 
-const ChatComponent = (props: Props) => {
+const ChatComponent = ({ chatId }: Props) => {
   const { input, handleInputChange, handleSubmit, messages } = useChat({
     api: "/api/chat",
+    body: {
+      chatId,
+    },
   });
+
+  // smooth scrolling down of the chat
+  React.useEffect(() => {
+    const messageContainer = document.getElementById("message-container");
+    if (messageContainer) {
+      messageContainer.scrollTo({
+        top: messageContainer.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [messages]);
+
   return (
-    <div className="relative h-screen">
+    <div className="relative h-screen" id="message-container">
       {/* headers */}
       <div className="sticky top-0 inset-x-0 p-2 bg-white h-fit">
         <h3 className="text-xl font-bold">Chat</h3>
