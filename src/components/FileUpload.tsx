@@ -11,7 +11,7 @@ const FileUpload = () => {
   const router = useRouter(); // make sure its coming from next/navigation
   const [uploading, setUploading] = useState(false);
 
-  const { mutate, isLoading } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async ({
       file_key,
       file_name,
@@ -78,10 +78,10 @@ const FileUpload = () => {
         })}
       >
         <input {...getInputProps()} />
-        {uploading || isLoading ? (
+        {uploading || isPending ? (
           <>
             {/* Loader Loading the Loading */}
-            <Loader2 className="h-10 w-10 text-blue-500 animate-sping" />
+            <Loader2 className="h-10 w-10 text-blue-500 animate-spin" />
             <p className="mt-2 text-sm text-slate-400">Heney on the GPT...</p>
           </>
         ) : (
