@@ -1,11 +1,11 @@
-import FileUpload from "@/components/FileUpload";
-import { Button } from "@/components/ui/button";
-import { UserButton, auth } from "@clerk/nextjs";
-import { LogIn } from "lucide-react";
-import Link from "next/link";
+import FileUpload from "@/components/FileUpload"
+import { Button } from "@/components/ui/button"
+import { UserButton, auth } from "@clerk/nextjs"
+import { LogIn } from "lucide-react"
+import Link from "next/link"
 export default async function Home() {
-  const { userId } = await auth();
-  const isAuth = !!userId; // check if we are logged in
+  const { userId } = await auth()
+  const isAuth = !!userId // check if we are logged in
   return (
     <div className="w-screen min-h-screen bg-gradient-to-r from-yellow-200 to-yellow-500">
       <div className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2">
@@ -39,5 +39,5 @@ export default async function Home() {
         </div>
       </div>
     </div>
-  );
+  )
 }

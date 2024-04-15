@@ -1,16 +1,31 @@
-"use client";
-import { DrizzleChat } from "@/lib/db/schema";
-import { cn } from "@/lib/utils";
-import { MessageCircle, PlusCircle } from "lucide-react";
-import Link from "next/link";
-import { Button } from "./ui/button";
+"use client"
+import { DrizzleChat } from "@/lib/db/schema"
+import { cn } from "@/lib/utils"
+import axios from "axios"
+import { MessageCircle, PlusCircle } from "lucide-react"
+import Link from "next/link"
+import React from "react"
+import { Button } from "./ui/button"
 
 type Props = {
-  chats: DrizzleChat[];
-  chatId: number;
-};
+  chats: DrizzleChat[]
+  chatId: number
+}
 
 const ChatSidebar = ({ chats, chatId }: Props) => {
+  const [loading, setLoading] = React.useState(false)
+
+  const handleSubscription = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.get("/api/stripe")
+      window.location.href = response.data.url
+    } catch (error) {
+      console.log("Handling subcrtiption error", error)
+    } finally {
+      setLoading(false)
+    }
+  }
   return (
     <div className="w-full h-screen p-4 text-gray-200 bg-gray-900">
       <Link href="/">
@@ -45,9 +60,16 @@ const ChatSidebar = ({ chats, chatId }: Props) => {
           <Link href="/">Home</Link>
           <Link href="/">Source</Link>
         </div>
+        <Button
+          className="mt-2 text-white bg-slate-700"
+          disabled={loading}
+          onClick={handleSubscription}
+        >
+          Upgrade to Pro!
+        </Button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ChatSidebar;
+export default ChatSidebar

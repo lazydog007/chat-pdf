@@ -1,35 +1,35 @@
-import ChatComponent from "@/components/ChatComponent";
-import ChatSidebar from "@/components/ChatSidebar";
-import PDFViewer from "@/components/PDFViewer";
-import { db } from "@/lib/db";
-import { chats } from "@/lib/db/schema";
-import { auth } from "@clerk/nextjs";
-import { eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
+import ChatComponent from "@/components/ChatComponent"
+import ChatSidebar from "@/components/ChatSidebar"
+import PDFViewer from "@/components/PDFViewer"
+import { db } from "@/lib/db"
+import { chats } from "@/lib/db/schema"
+import { auth } from "@clerk/nextjs"
+import { eq } from "drizzle-orm"
+import { redirect } from "next/navigation"
 type Props = {
   params: {
-    chatId: string;
-  };
-};
+    chatId: string
+  }
+}
 
 const ChatPage = async ({ params: { chatId } }: Props) => {
-  const { userId } = await auth();
+  const { userId } = await auth()
   if (!userId) {
-    return redirect("/sign-in");
+    return redirect("/sign-in")
   }
 
   // _chats are the list of the chats that the user has
-  const _chats = await db.select().from(chats).where(eq(chats.userId, userId));
+  const _chats = await db.select().from(chats).where(eq(chats.userId, userId))
 
   if (!_chats) {
-    return redirect("/");
+    return redirect("/")
   }
 
   if (!_chats.find((chat) => chat.id === parseInt(chatId))) {
-    return redirect("/");
+    return redirect("/")
   }
 
-  const currentChat = _chats.find((chat) => chat.id === parseInt(chatId));
+  const currentChat = _chats.find((chat) => chat.id === parseInt(chatId))
 
   return (
     <div className="flex h-screen">
@@ -48,7 +48,7 @@ const ChatPage = async ({ params: { chatId } }: Props) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ChatPage;
+export default ChatPage

@@ -1,31 +1,31 @@
-import { getContext } from "@/lib/context";
-import { db } from "@/lib/db";
-import { messages as _messages, chats } from "@/lib/db/schema";
-import { Message, OpenAIStream, StreamingTextResponse } from "ai";
-import { eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
-import { Configuration, OpenAIApi } from "openai-edge";
-import toast from "react-hot-toast";
+import { getContext } from "@/lib/context"
+import { db } from "@/lib/db"
+import { messages as _messages, chats } from "@/lib/db/schema"
+import { Message, OpenAIStream, StreamingTextResponse } from "ai"
+import { eq } from "drizzle-orm"
+import { NextResponse } from "next/server"
+import { Configuration, OpenAIApi } from "openai-edge"
+import toast from "react-hot-toast"
 const config = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
-});
+})
 
-const openai = new OpenAIApi(config);
+const openai = new OpenAIApi(config)
 
 export async function POST(req: Request) {
   try {
-    const { messages, chatId } = await req.json();
+    const { messages, chatId } = await req.json()
 
     // get the chats from the db
-    const _chats = await db.select().from(chats).where(eq(chats.id, chatId));
+    const _chats = await db.select().from(chats).where(eq(chats.id, chatId))
 
     if (_chats.length != 1) {
-      return NextResponse.json({ error: "chat not found" }, { status: 404 });
+      return NextResponse.json({ error: "chat not found" }, { status: 404 })
     }
 
-    const fileKey = _chats[0].fileKey;
-    const lastMessage = messages[messages.length - 1];
-    const context = await getContext(lastMessage.content, fileKey);
+    const fileKey = _chats[0].fileKey
+    const lastMessage = messages[messages.length - 1]
+    const context = await getContext(lastMessage.content, fileKey)
 
     const prompt = {
       role: "system",
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       It the context does not provide the answer to question, the Al assistant will say, but don"t know therant
       Al assistant will not apologize for previous responses, but instead will indicated new information was gained.
       Al assistant will not invent anything that is not draw directly from the context.`,
-    };
+    }
 
     const response = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
         ...messages.filter((message: Message) => message.role === "user"), // only messages from the user
       ],
       stream: true,
-    });
+    })
 
     // streaming effect is awesome
     // completion is the response from the AI
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
           chatId,
           content: lastMessage.content,
           role: "user",
-        }); // make sure its drizzle
+        }) // make sure its drizzle
       },
       onCompletion: async (completion) => {
         // save ai message into db
@@ -69,12 +69,12 @@ export async function POST(req: Request) {
           chatId,
           content: completion,
           role: "system",
-        }); // make sure its drizzle
+        }) // make sure its drizzle
       },
-    });
-    return new StreamingTextResponse(stream);
+    })
+    return new StreamingTextResponse(stream)
   } catch (error) {
-    console.log("something bad happened");
-    toast.error("Error creating chat" + error);
+    console.log("something bad happened")
+    toast.error("Error creating chat" + error)
   }
 }

@@ -1,11 +1,11 @@
-import { cn } from "@/lib/utils";
-import { Message } from "ai/react";
-import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils"
+import { Message } from "ai/react"
+import { Loader2 } from "lucide-react"
 
 type Props = {
-  isPending: boolean;
-  messages: Message[];
-};
+  isPending: boolean
+  messages: Message[]
+}
 
 const MessageList = ({ messages, isPending }: Props) => {
   if (isPending) {
@@ -13,9 +13,9 @@ const MessageList = ({ messages, isPending }: Props) => {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <Loader2 className="w-12 h-12 animate-spin" />
       </div>
-    );
+    )
   }
-  if (!messages) return <></>;
+  if (!messages) return <></>
   return (
     <div className="flex flex-col gap-2 px-4">
       {messages.map((message) => {
@@ -39,10 +39,10 @@ const MessageList = ({ messages, isPending }: Props) => {
               <p>{message.content}</p>
             </div>
           </div>
-        );
+        )
       })}
     </div>
-  );
-};
+  )
+}
 
-export default MessageList;
+export default MessageList

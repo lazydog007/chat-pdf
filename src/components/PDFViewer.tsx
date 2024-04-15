@@ -1,4 +1,4 @@
-type Props = { pdf_url: string };
+type Props = { pdf_url: string }
 
 const PDFViewer = ({ pdf_url }: Props) => {
   return (
@@ -6,7 +6,7 @@ const PDFViewer = ({ pdf_url }: Props) => {
       src={`http://docs.google.com/gview?url=${pdf_url}&embedded=true`}
       className="w-full h-full"
     />
-  );
-};
+  )
+}
 
-export default PDFViewer;
+export default PDFViewer

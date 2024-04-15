@@ -1,14 +1,14 @@
-"use client";
+"use client"
 
-import { useQuery } from "@tanstack/react-query";
-import { Message, useChat } from "ai/react";
-import axios from "axios";
-import { Send } from "lucide-react";
-import React from "react";
-import MessageList from "./MessageList";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-type Props = { chatId: number };
+import { useQuery } from "@tanstack/react-query"
+import { Message, useChat } from "ai/react"
+import axios from "axios"
+import { Send } from "lucide-react"
+import React from "react"
+import MessageList from "./MessageList"
+import { Button } from "./ui/button"
+import { Input } from "./ui/input"
+type Props = { chatId: number }
 
 const ChatComponent = ({ chatId }: Props) => {
   // This gets the old messages
@@ -17,28 +17,28 @@ const ChatComponent = ({ chatId }: Props) => {
     queryFn: async () => {
       const response = await axios.post<Message[]>(`/api/get-messages`, {
         chatId,
-      });
-      return await response.data;
+      })
+      return await response.data
     },
-  });
+  })
   const { input, handleInputChange, handleSubmit, messages } = useChat({
     api: "/api/chat",
     body: {
       chatId,
     },
     initialMessages: data || [],
-  });
+  })
 
   // smooth scrolling down of the chat
   React.useEffect(() => {
-    const messageContainer = document.getElementById("message-container");
+    const messageContainer = document.getElementById("message-container")
     if (messageContainer) {
       messageContainer.scrollTo({
         top: messageContainer.scrollHeight,
         behavior: "smooth",
-      });
+      })
     }
-  }, [messages]);
+  }, [messages])
 
   return (
     <div className="relative h-screen" id="message-container">
@@ -69,7 +69,7 @@ const ChatComponent = ({ chatId }: Props) => {
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default ChatComponent;
+export default ChatComponent
