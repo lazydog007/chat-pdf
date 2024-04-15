@@ -4,16 +4,18 @@ import { cn } from "@/lib/utils"
 import axios from "axios"
 import { MessageCircle, PlusCircle } from "lucide-react"
 import Link from "next/link"
-import React from "react"
+import { useState } from "react"
+import SubscriptionButton from "./SubscriptionButton"
 import { Button } from "./ui/button"
 
 type Props = {
   chats: DrizzleChat[]
   chatId: number
+  isPro: boolean
 }
 
-const ChatSidebar = ({ chats, chatId }: Props) => {
-  const [loading, setLoading] = React.useState(false)
+const ChatSidebar = ({ chats, chatId, isPro }: Props) => {
+  const [loading, setLoading] = useState(false)
 
   const handleSubscription = async () => {
     try {
@@ -60,13 +62,8 @@ const ChatSidebar = ({ chats, chatId }: Props) => {
           <Link href="/">Home</Link>
           <Link href="/">Source</Link>
         </div>
-        <Button
-          className="mt-2 text-white bg-slate-700"
-          disabled={loading}
-          onClick={handleSubscription}
-        >
-          Upgrade to Pro!
-        </Button>
+
+        <SubscriptionButton isPro={isPro} />
       </div>
     </div>
   )
