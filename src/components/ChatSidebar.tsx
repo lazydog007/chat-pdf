@@ -1,7 +1,6 @@
 "use client"
 import { DrizzleChat } from "@/lib/db/schema"
 import { cn } from "@/lib/utils"
-import axios from "axios"
 import { MessageCircle, PlusCircle } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
@@ -17,17 +16,6 @@ type Props = {
 const ChatSidebar = ({ chats, chatId, isPro }: Props) => {
   const [loading, setLoading] = useState(false)
 
-  const handleSubscription = async () => {
-    try {
-      setLoading(true)
-      const response = await axios.get("/api/stripe")
-      window.location.href = response.data.url
-    } catch (error) {
-      console.log("Handling subcrtiption error", error)
-    } finally {
-      setLoading(false)
-    }
-  }
   return (
     <div className="w-full h-screen p-4 text-gray-200 bg-gray-900">
       <Link href="/">
@@ -37,7 +25,7 @@ const ChatSidebar = ({ chats, chatId, isPro }: Props) => {
         </Button>
       </Link>
 
-      <div className="flex flex-col gap-2 mt-4">
+      <div className="flex flex-col gap-2 mt-4" id="middleSideBar">
         {chats.map((chat) => (
           <Link key={chat.id} href={`/chat/${chat.id}`}>
             {/*  this styles the squares in the sidebar */}
@@ -57,13 +45,12 @@ const ChatSidebar = ({ chats, chatId, isPro }: Props) => {
         ))}
       </div>
 
-      <div className="absolute bottom-4 left-4">
+      <div className="absolute bottom-4 left-4" id="bottomChatSidebar">
         <div className="flex items-center gap-2 text-sm text-slate-500 flex-wrap">
           <Link href="/">Home</Link>
           <Link href="/">Source</Link>
+          <SubscriptionButton isPro={isPro} />
         </div>
-
-        <SubscriptionButton isPro={isPro} />
       </div>
     </div>
   )
