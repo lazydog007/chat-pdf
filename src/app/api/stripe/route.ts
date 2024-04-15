@@ -38,7 +38,7 @@ export async function GET() {
       payment_method_types: ["card"],
       mode: "subscription",
       billing_address_collection: "auto",
-      customer_email: user?.emailAddresses[0].emailAddress,
+      customer_email: user?.emailAddresses[0]?.emailAddress || "no@email.com",
       line_items: [
         {
           price_data: {
