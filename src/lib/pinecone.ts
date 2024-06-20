@@ -62,9 +62,6 @@ export async function loadS3IntoPinecode(
   console.log("inserting vectors into pinecone")
   await namespace.upsert(vectors)
 
-  // const namespace = convertToAscii(file_key); // needs to be all ASCII
-
-  // PinecodeUtils.chunkedUpsert(pinecondeIndex, vectors, namespace);
   return documents[0]
 }
 
